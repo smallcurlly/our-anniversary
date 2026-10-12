@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7eddb">
+  <title>Наша маленька історія ♡</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="paper-texture"></div>
+  <header class="topbar">
+    <a class="brand" href="#home">♡ наша історія</a>
+    <button class="music-button" id="musicToggle" type="button" aria-label="Увімкнути або вимкнути музику">♫ <span id="musicLabel">Увімкнути музику</span></button>
+  </header>
+
+  <main>
+    <section class="hero section" id="home">
+      <div class="tape tape-one"></div><div class="tape tape-two"></div>
+      <p class="eyebrow">один рік • тисячі спогадів</p>
+      <h1>Мені подобається<br><em>наше «назавжди».</em></h1>
+      <p class="intro">Цей маленький куточок інтернету — про нас, наші пригоди й усе, що я хочу пам’ятати.</p>
+      <div class="hero-photo polaroid">
+        <img src="photos/cover.jpg" alt="Наше улюблене фото" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'">
+        <div class="photo-placeholder">Додай сюди<br>ваше фото ♡</div>
+        <span>моє улюблене місце — поруч із тобою</span>
+      </div>
+      <a class="button" href="#gallery">Відкрити наш альбом ↓</a>
+      <div class="doodle heart">♡</div>
+    </section>
+
+    <section class="section timer-section" id="timer">
+      <p class="eyebrow">і це тільки початок</p>
+      <h2>Ми разом уже…</h2>
+      <div class="timer" aria-live="polite">
+        <div><strong id="days">0</strong><span>днів</span></div>
+        <div><strong id="hours">00</strong><span>годин</span></div>
+        <div><strong id="minutes">00</strong><span>хвилин</span></div>
+        <div><strong id="seconds">00</strong><span>секунд</span></div>
+      </div>
+      <p class="small-note">Відлік від дня, коли наша історія почалася.</p>
+    </section>
+
+    <section class="section" id="story">
+      <p class="eyebrow">сторінки нашого життя</p>
+      <h2>Як усе починалося</h2>
+      <div class="timeline">
+        <article class="memory"><span class="memory-date">НАШ ПОЧАТОК</span><h3>День, який усе змінив</h3><p>Напиши тут, як ви познайомилися, що ти відчував і що запам’ятав найбільше.</p></article>
+        <article class="memory"><span class="memory-date">ОДИН ІЗ НАШИХ ДНІВ</span><h3>Маленька пригода</h3><p>Згадайте вашу прогулянку, поїздку або випадок, з якого ви досі смієтеся.</p></article>
+        <article class="memory"><span class="memory-date">СЬОГОДНІ</span><h3>Наша перша річниця</h3><p>Рік поруч із тобою — це багато тепла, підтримки й моментів, які я хочу зберегти.</p></article>
+      </div>
+    </section>
+
+    <section class="section gallery-section" id="gallery">
+      <p class="eyebrow">маленькі шматочки щастя</p>
+      <h2>Наша фотогалерея</h2>
+      <p class="section-intro">Додай фото з пристрою для перегляду в цьому браузері або поклади фотографії в папку <code>photos</code>, щоб вони були частиною опублікованого сайту.</p>
+      <div class="gallery" id="galleryGrid">
+        <figure class="polaroid tilt-left"><img src="photos/photo-1.jpg" alt="Спогад 1" onerror="this.parentElement.classList.add('empty-photo');this.style.display='none'"><div class="empty-label">Ваш перший спогад ♡</div><figcaption>той день, коли…</figcaption></figure>
+        <figure class="polaroid tilt-right"><img src="photos/photo-2.jpg" alt="Спогад 2" onerror="this.parentElement.classList.add('empty-photo');this.style.display='none'"><div class="empty-label">Щасливий момент ♡</div><figcaption>усмішка, яку люблю</figcaption></figure>
+        <figure class="polaroid tilt-left"><img src="photos/photo-3.jpg" alt="Спогад 3" onerror="this.parentElement.classList.add('empty-photo');this.style.display='none'"><div class="empty-label">Наша пригода ♡</div><figcaption>і це ще не все</figcaption></figure>
+      </div>
+      <p class="small-note">Щоб додати фото назавжди, поклади файли в папку <code>photos</code>, зміни назви/підписи нижче в <code>index.html</code> та повторно опублікуй сайт.</p>
+    </section>
+
+    <section class="section envelopes-section" id="letters">
+      <p class="eyebrow">відкрити, коли захочеш тепла</p>
+      <h2>Листи для тебе</h2>
+      <p class="section-intro">Обери конверт. Усередині — слова, які можна перечитувати знову.</p>
+      <div class="envelopes">
+        <button class="envelope" data-letter="miss" type="button"><span class="envelope-art">✉</span><span>Коли сумуєш</span></button>
+        <button class="envelope" data-letter="sad" type="button"><span class="envelope-art">✉</span><span>Коли сумно</span></button>
+        <button class="envelope" data-letter="anniversary" type="button"><span class="envelope-art">✉</span><span>На нашу річницю</span></button>
+      </div>
+      <article class="letter" id="letterPanel" hidden>
+        <button class="close-letter" id="closeLetter" type="button" aria-label="Закрити лист">×</button>
+        <p class="eyebrow">тільки для тебе ♡</p><h3 id="letterTitle"></h3><p id="letterText"></p>
+      </article>
+    </section>
+
+    <section class="section secret-section" id="secret">
+      <div class="secret-card">
+        <span class="stamp">ЛИСТ<br>№ 001</span>
+        <p class="eyebrow">є дещо особливе</p>
+        <h2>Таємний лист</h2>
+        <p>Введи наше секретне слово, щоб відкрити послання.</p>
+        <p class="demo-warning">Демо-захист: пароль і текст листа зберігаються у файлах сайту. Не використовуй це для справді приватних матеріалів.</p>
+        <form id="secretForm">
+          <input id="secretPassword" type="password" placeholder="Наш секрет…" autocomplete="off" required>
+          <button class="button" type="submit">Відкрити лист</button>
+        </form>
+        <p class="error" id="passwordError" hidden>Не той секрет. Спробуй ще раз ♡</p>
+        <div id="secretLetter" class="secret-letter" hidden>
+          <h3>Моє кохання,</h3>
+          <p>Дякую тобі за цей рік. За кожну усмішку, кожну розмову, за те, що поруч із тобою звичайні дні стають особливими. Я не знаю всіх сторінок, які на нас чекають, але дуже хочу писати їх разом із тобою. З нашою першою річницею. Я тебе люблю. ♡</p>
+          <p class="signature">Твоя людина ♡</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section qr-section" id="qr">
+      <p class="eyebrow">для паперового альбому</p>
+      <h2>Наші спогади — в одному скануванні</h2>
+      <div class="qr-card">
+        <div class="qr-placeholder">QR<br>♡</div>
+        <div>
+          <h3>Відскануй, щоб повернутися до нас</h3>
+          <p>Після публікації створи QR-код із посилання на цей сайт і збережи зображення як <code>photos/qr-code.png</code>. Тоді заміни цей блок на картинку QR-коду.</p>
+          <p class="small-note">Не друкуй QR-код, доки не перевіриш його телефоном.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section final-note">
+      <p class="eyebrow">на згадку про нас</p>
+      <h2>Це не просто альбом.</h2>
+      <p>Це нагадування про те, як сильно я радий, що саме ти є в моєму житті.</p>
+      <p class="big-heart">♡</p>
+      <p class="small-note">З любов’ю, для тебе. Завжди.</p>
+    </section>
+  </main>
+
+  <footer>зроблено з любов’ю, тільки для нас ♡</footer>
+  <div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Перегляд фотографії">
+    <button id="closeLightbox" type="button" aria-label="Закрити фото">×</button>
+    <img id="lightboxImage" src="" alt="">
+    <p id="lightboxCaption"></p>
+  </div>
+  <audio id="backgroundMusic" src="music/our-song.mp3" preload="none" loop></audio>
+  <script src="script.js"></script>
+</body>
+</html>
