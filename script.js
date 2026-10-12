@@ -111,10 +111,8 @@ musicToggle.addEventListener("click", async () => {
     try {
       await music.play();
       musicLabel.textContent = "Вимкнути музику";
-    } catch {
-      musicLabel.textContent = "Додай music/our-song.mp3";
-      alert("Додай аудіофайл у папку music і назви його our-song.mp3.");
-    }
+    } catch 
+      
   } else {
     music.pause();
     musicLabel.textContent = "Увімкнути музику";
