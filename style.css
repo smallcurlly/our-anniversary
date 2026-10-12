@@ -15,3 +15,30 @@
 .lightbox{position:fixed;inset:0;z-index:20;background:#241d1beF;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
 .lightbox[hidden]{display:none}.lightbox img{max-width:min(92vw,1000px);max-height:78vh;object-fit:contain;box-shadow:0 12px 50px #0007}.lightbox p{color:#fffaf0;font-family:'Caveat',cursive;font-size:1.5rem;text-align:center}.lightbox button{position:absolute;right:22px;top:12px;border:0;background:transparent;color:white;font-size:2.5rem;cursor:pointer}
 @media(max-width:600px){.qr-card{flex-direction:column;text-align:center}.qr-placeholder{width:120px;min-width:120px;height:120px}.lightbox{padding:12px}}
+
+/* Великі Polaroid-фото */
+.extra-gallery .gallery {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.extra-gallery .gallery img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.extra-gallery .polaroid {
+  padding: 12px 12px 20px;
+}
+
+@media (max-width: 650px) {
+  .extra-gallery .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .extra-gallery .gallery img {
+    height: 180px;
+  }
+}
