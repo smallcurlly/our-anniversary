@@ -859,3 +859,34 @@ code {
     width: min(175px, 100%);
   }
 }
+
+/* На телефоні — фото в один горизонтальний рядок */
+@media (max-width: 650px) {
+  .gallery,
+  .extra-gallery .gallery {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 18px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 12px 6px 20px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gallery .polaroid,
+  .extra-gallery .gallery .polaroid {
+    flex: 0 0 75%;
+    min-width: 0;
+    scroll-snap-align: center;
+  }
+
+  .gallery img,
+  .extra-gallery .gallery img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: contain;
+  }
+}
