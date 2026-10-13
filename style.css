@@ -38,3 +38,24 @@
     height: 180px;
   }
 }
+
+.voice-message {
+  margin: 24px auto 0;
+  padding: 16px;
+  max-width: 400px;
+  background: #f5e3d3;
+  border: 1px solid #dfc2a9;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.voice-message p {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.voice-message audio {
+  display: block;
+  width: 100%;
+}
+
