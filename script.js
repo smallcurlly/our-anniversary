@@ -1,10 +1,27 @@
 
+"use strict";
+
+// ================================
 // НАЛАШТУВАННЯ
+// ================================
 const START_DATE = "2025-10-29T00:00:00";
 const SECRET_PASSWORD = "мяу";
 
+
+// ================================
 // ЛІЧИЛЬНИК ЧАСУ РАЗОМ
+// ================================
 function updateTimer() {
+  const daysElement = document.getElementById("days");
+  const hoursElement = document.getElementById("hours");
+  const minutesElement = document.getElementById("minutes");
+  const secondsElement = document.getElementById("seconds");
+
+  // Якщо елементів лічильника немає, нічого не робимо
+  if (!daysElement || !hoursElement || !minutesElement || !secondsElement) {
+    return;
+  }
+
   const start = new Date(START_DATE).getTime();
   const now = Date.now();
   let diff = Math.max(0, now - start);
@@ -18,20 +35,19 @@ function updateTimer() {
   const minutes = Math.floor(diff / 60000);
   const seconds = Math.floor((diff % 60000) / 1000);
 
-  document.getElementById("days").textContent = days;
-  document.getElementById("hours").textContent =
-    String(hours).padStart(2, "0");
-  document.getElementById("minutes").textContent =
-    String(minutes).padStart(2, "0");
-  document.getElementById("seconds").textContent =
-    String(seconds).padStart(2, "0");
+  daysElement.textContent = days;
+  hoursElement.textContent = String(hours).padStart(2, "0");
+  minutesElement.textContent = String(minutes).padStart(2, "0");
+  secondsElement.textContent = String(seconds).padStart(2, "0");
 }
 
 updateTimer();
 setInterval(updateTimer, 1000);
 
 
+// ================================
 // ТЕКСТИ КОНВЕРТІВ
+// ================================
 const letters = {
   miss: {
     title: "Коли ти сумуєш",
@@ -85,30 +101,26 @@ const letters = {
 };
 
 
-// ВІДКРИВАННЯ КОНВЕРТІВ І ГОЛОСОВЕ ПОВІДОМЛЕННЯ
+// ================================
+// КОНВЕРТИ ТА ГОЛОСОВЕ ПОВІДОМЛЕННЯ
+// ================================
 const letterPanel = document.getElementById("letterPanel");
 const letterText = document.getElementById("letterText");
 const letterTitle = document.getElementById("letterTitle");
+const closeLetterButton = document.getElementById("closeLetter");
 
-document.querySelectorAll(".envelope").forEach(button => {
-  button.addEventListener("click", () => {
-    const letter = letters[button.dataset.letter];
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) {
+    return "0:00";
+  }
 
-    if (!letter) return;
+  const minutes = Math.floor(seconds / 60);
+  const remaining = Math.floor(seconds % 60);
 
-    letterTitle.textContent = letter.title;
-    letterText.textContent = letter.text;
+  return `${minutes}:${String(remaining).padStart(2, "0")}`;
+}
 
-    // Прибираємо плеєр попереднього листа
-    const oldAudio = letterPanel.querySelector(".voice-message");
-
-    if (oldAudio) {
-      oldAudio.querySelector("audio")?.pause();
-      oldAudio.remove();
-    }
-
-   
-if (letter.audio) {
+function createVoicePlayer(audioPath) {
   const voiceBox = document.createElement("div");
   voiceBox.className = "voice-message";
 
@@ -117,7 +129,7 @@ if (letter.audio) {
   caption.textContent = "♡ Голосове послання для тебе ♡";
 
   const player = document.createElement("audio");
-  player.src = letter.audio;
+  player.src = audioPath;
   player.preload = "metadata";
 
   const controls = document.createElement("div");
@@ -127,12 +139,14 @@ if (letter.audio) {
   playButton.className = "play-button";
   playButton.type = "button";
   playButton.textContent = "▶";
+  playButton.setAttribute("aria-label", "Відтворити голосове повідомлення");
 
   const progress = document.createElement("input");
   progress.className = "audio-progress";
   progress.type = "range";
   progress.min = "0";
   progress.max = "100";
+  progress.step = "0.1";
   progress.value = "0";
   progress.setAttribute("aria-label", "Позиція аудіо");
 
@@ -142,21 +156,17 @@ if (letter.audio) {
 
   controls.append(playButton, progress, time);
   voiceBox.append(caption, player, controls);
-  letterText.insertAdjacentElement("afterend", voiceBox);
 
-  function formatTime(seconds) {
-    if (!Number.isFinite(seconds)) return "0:00";
-    const minutes = Math.floor(seconds / 60);
-    const remaining = Math.floor(seconds % 60);
-    return `${minutes}:${String(remaining).padStart(2, "0")}`;
-  }
-
+  // Кнопка відтворення та паузи
   playButton.addEventListener("click", async () => {
     if (player.paused) {
       try {
         await player.play();
-      } catch {
-        caption.textContent = "Не вдалося відтворити аудіо 😔 Перевір файл voice.mp3";
+      } catch (error) {
+        caption.textContent =
+          "Не вдалося відтворити аудіо 😔 Перевір файл audio/voice.mp3.";
+
+        console.error("Помилка відтворення голосового повідомлення:", error);
       }
     } else {
       player.pause();
@@ -165,38 +175,87 @@ if (letter.audio) {
 
   player.addEventListener("play", () => {
     playButton.textContent = "Ⅱ";
+    playButton.setAttribute("aria-label", "Призупинити голосове повідомлення");
   });
 
   player.addEventListener("pause", () => {
     playButton.textContent = "▶";
+    playButton.setAttribute("aria-label", "Відтворити голосове повідомлення");
   });
 
+  // Тривалість аудіо
   player.addEventListener("loadedmetadata", () => {
     time.textContent = `0:00 / ${formatTime(player.duration)}`;
   });
 
+  // Оновлення часу та смужки прогресу
   player.addEventListener("timeupdate", () => {
     const percent = player.duration
       ? (player.currentTime / player.duration) * 100
       : 0;
 
     progress.value = percent;
+
     time.textContent =
       `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`;
   });
 
+  // Перемотування аудіо
   progress.addEventListener("input", () => {
     if (player.duration) {
-      player.currentTime = (Number(progress.value) / 100) * player.duration;
+      player.currentTime =
+        (Number(progress.value) / 100) * player.duration;
     }
   });
 
+  // Коли голосове закінчилося
   player.addEventListener("ended", () => {
     playButton.textContent = "▶";
     progress.value = "0";
+    time.textContent = `0:00 / ${formatTime(player.duration)}`;
   });
+
+  // Якщо файл не завантажився
+  player.addEventListener("error", () => {
+    caption.textContent =
+      "Не вдалося завантажити голосове 😔 Перевір файл audio/voice.mp3.";
+  });
+
+  return voiceBox;
 }
 
+document.querySelectorAll(".envelope").forEach(button => {
+  button.addEventListener("click", () => {
+    const letter = letters[button.dataset.letter];
+
+    if (!letter || !letterPanel || !letterText || !letterTitle) {
+      return;
+    }
+
+    // Зупиняємо попереднє голосове та прибираємо його
+    const oldVoice = letterPanel.querySelector(".voice-message");
+
+    if (oldVoice) {
+      const oldPlayer = oldVoice.querySelector("audio");
+
+      if (oldPlayer) {
+        oldPlayer.pause();
+        oldPlayer.removeAttribute("src");
+        oldPlayer.load();
+      }
+
+      oldVoice.remove();
+    }
+
+    // Показуємо текст листа
+    letterTitle.textContent = letter.title;
+    letterText.textContent = letter.text;
+
+    // Додаємо гарний плеєр лише для листа з голосовим
+    if (letter.audio) {
+      const voiceBox = createVoicePlayer(letter.audio);
+      letterText.insertAdjacentElement("afterend", voiceBox);
+    }
 
     letterPanel.hidden = false;
 
@@ -207,116 +266,148 @@ if (letter.audio) {
   });
 });
 
+// Закриття листа
+if (closeLetterButton && letterPanel) {
+  closeLetterButton.addEventListener("click", () => {
+    const player = letterPanel.querySelector(".voice-message audio");
 
-// ЗАКРИТТЯ КОНВЕРТА
-document.getElementById("closeLetter").addEventListener("click", () => {
-  const player = letterPanel.querySelector(".voice-message audio");
+    if (player) {
+      player.pause();
+      player.currentTime = 0;
+    }
 
-  if (player) player.pause();
+    letterPanel.hidden = true;
+  });
+}
 
-  letterPanel.hidden = true;
-});
 
-
+// ================================
 // СЕКРЕТНИЙ ЛИСТ
-document.getElementById("secretForm").addEventListener("submit", event => {
-  event.preventDefault();
+// ================================
+const secretForm = document.getElementById("secretForm");
 
-  const entered =
-    document.getElementById("secretPassword").value;
+if (secretForm) {
+  secretForm.addEventListener("submit", event => {
+    event.preventDefault();
 
-  const correct = entered === SECRET_PASSWORD;
+    const passwordInput = document.getElementById("secretPassword");
+    const secretLetter = document.getElementById("secretLetter");
+    const passwordError = document.getElementById("passwordError");
 
-  document.getElementById("secretLetter").hidden = !correct;
-  document.getElementById("passwordError").hidden = correct;
+    if (!passwordInput || !secretLetter || !passwordError) {
+      return;
+    }
 
-  if (correct) {
-    document.getElementById("secretLetter").scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }
-});
+    const entered = passwordInput.value;
+    const correct = entered === SECRET_PASSWORD;
+
+    secretLetter.hidden = !correct;
+    passwordError.hidden = correct;
+
+    if (correct) {
+      secretLetter.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+  });
+}
 
 
-// ПЕРЕГЛЯД ФОТОГРАФІЙ У ВЕЛИКОМУ ФОРМАТІ
+// ================================
+// ПЕРЕГЛЯД ФОТОГРАФІЙ
+// ================================
 const lightbox = document.getElementById("lightbox");
 const lightboxImage = document.getElementById("lightboxImage");
 const lightboxCaption = document.getElementById("lightboxCaption");
+const closeLightboxButton = document.getElementById("closeLightbox");
 
-document.querySelectorAll(
-  ".gallery .polaroid img, .hero-photo img"
-).forEach(img => {
-  img.tabIndex = 0;
-  img.style.cursor = "zoom-in";
+if (lightbox && lightboxImage && lightboxCaption) {
+  document.querySelectorAll(
+    ".gallery .polaroid img, .hero-photo img"
+  ).forEach(img => {
+    img.tabIndex = 0;
+    img.style.cursor = "zoom-in";
 
-  const openPhoto = () => {
-    if (!img.src || img.style.display === "none") return;
+    const openPhoto = () => {
+      if (!img.src || img.style.display === "none") {
+        return;
+      }
 
-    lightboxImage.src = img.src;
-    lightboxImage.alt = img.alt || "Фотографія зі спогадів";
+      lightboxImage.src = img.src;
+      lightboxImage.alt = img.alt || "Фотографія зі спогадів";
 
-    const caption =
-      img.closest("figure")?.querySelector("figcaption")?.textContent ||
-      img.closest(".hero-photo")?.querySelector("span")?.textContent ||
-      img.alt;
+      const caption =
+        img.closest("figure")?.querySelector("figcaption")?.textContent ||
+        img.closest(".hero-photo")?.querySelector("span")?.textContent ||
+        img.alt;
 
-    lightboxCaption.textContent = caption || "";
-    lightbox.hidden = false;
+      lightboxCaption.textContent = caption || "";
+      lightbox.hidden = false;
 
-    document.getElementById("closeLightbox").focus();
-  };
+      if (closeLightboxButton) {
+        closeLightboxButton.focus();
+      }
+    };
 
-  img.addEventListener("click", openPhoto);
+    img.addEventListener("click", openPhoto);
 
-  img.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      openPhoto();
+    img.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openPhoto();
+      }
+    });
+  });
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    lightboxImage.src = "";
+  }
+
+  if (closeLightboxButton) {
+    closeLightboxButton.addEventListener("click", closeLightbox);
+  }
+
+  lightbox.addEventListener("click", event => {
+    if (event.target === lightbox) {
+      closeLightbox();
     }
   });
-});
 
-function closeLightbox() {
-  lightbox.hidden = true;
-  lightboxImage.src = "";
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !lightbox.hidden) {
+      closeLightbox();
+    }
+  });
 }
 
-document.getElementById("closeLightbox").addEventListener(
-  "click",
-  closeLightbox
-);
 
-lightbox.addEventListener("click", event => {
-  if (event.target === lightbox) closeLightbox();
-});
-
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape" && !lightbox.hidden) {
-    closeLightbox();
-  }
-});
-
-
+// ================================
 // ФОНОВА МУЗИКА
+// ================================
 const music = document.getElementById("backgroundMusic");
 const musicToggle = document.getElementById("musicToggle");
 const musicLabel = document.getElementById("musicLabel");
 
-musicToggle.addEventListener("click", async () => {
-  if (music.paused) {
-    try {
-      await music.play();
-      musicLabel.textContent = "Вимкнути музику";
-    } catch (error) {
-      musicLabel.textContent = "Не вдалося ввімкнути музику";
-      alert(
-        "Не вдалося відтворити музику. Перевір файл music/our-song.mp3."
-      );
-      console.error("Помилка відтворення музики:", error);
+if (music && musicToggle && musicLabel) {
+  musicToggle.addEventListener("click", async () => {
+    if (music.paused) {
+      try {
+        await music.play();
+        musicLabel.textContent = "Вимкнути музику";
+      } catch (error) {
+        musicLabel.textContent = "Не вдалося ввімкнути музику";
+
+        alert(
+          "Не вдалося відтворити музику. Перевір файл music/our-song.mp3."
+        );
+
+        console.error("Помилка відтворення музики:", error);
+      }
+    } else {
+      music.pause();
+      musicLabel.textContent = "Увімкнути музику";
     }
-  } else {
-    music.pause();
-    musicLabel.textContent = "Увімкнути музику";
-  }
-});
+  });
+}
