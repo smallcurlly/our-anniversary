@@ -39,23 +39,68 @@
   }
 }
 
+/* Вінтажний плеєр голосового послання */
 .voice-message {
+  width: min(100% - 32px, 400px);
+  box-sizing: border-box;
   margin: 24px auto 0;
-  padding: 16px;
-  max-width: 400px;
-  background: #f5e3d3;
-  border: 1px solid #dfc2a9;
-  border-radius: 4px;
+  padding: 20px;
+  background: linear-gradient(145deg, #f8e9dc, #f3dfcf);
+  border: 1px solid #dfb99f;
+  border-radius: 14px;
+  box-shadow: 0 5px 12px #805b3b12;
   text-align: center;
 }
 
-.voice-message p {
-  margin: 0 0 12px;
-  font-size: 16px;
+.voice-caption {
+  margin: 0 0 17px;
+  color: #9e6468;
+  font-family: Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
 }
 
 .voice-message audio {
-  display: block;
-  width: 100%;
+  display: none;
+}
+
+.custom-player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play-button {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: #c9787d;
+  color: #fffaf4;
+  font-size: 17px;
+  cursor: pointer;
+  box-shadow: 0 3px 7px #9d555533;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.play-button:hover {
+  background: #b96870;
+  transform: scale(1.06);
+}
+
+.audio-progress {
+  flex: 1;
+  min-width: 0;
+  height: 5px;
+  accent-color: #c9787d;
+  cursor: pointer;
+}
+
+.audio-time {
+  flex-shrink: 0;
+  color: #826d60;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
