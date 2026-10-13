@@ -57,7 +57,7 @@ const letters = {
   },
 
   sad: {
-    title: "Коли хочеш почути мене",
+    title: "Мяяяяууу",
     text: `Кохаю тебе моя зірочка`,
     audio: "audio/voice.mp3"
   },
