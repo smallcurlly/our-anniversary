@@ -107,28 +107,96 @@ document.querySelectorAll(".envelope").forEach(button => {
       oldAudio.remove();
     }
 
-    // Голосове повідомлення тільки для конверта sad
-    if (letter.audio) {
-      const voiceBox = document.createElement("div");
-      voiceBox.className = "voice-message";
+   
+if (letter.audio) {
+  const voiceBox = document.createElement("div");
+  voiceBox.className = "voice-message";
 
-      const caption = document.createElement("p");
-      caption.textContent = "💌 А тепер послухай дещо від мене...";
+  const caption = document.createElement("p");
+  caption.className = "voice-caption";
+  caption.textContent = "♡ Голосове послання для тебе ♡";
 
-      const player = document.createElement("audio");
-      player.controls = true;
-      player.preload = "metadata";
+  const player = document.createElement("audio");
+  player.src = letter.audio;
+  player.preload = "metadata";
 
-      const source = document.createElement("source");
-      source.src = letter.audio;
-      source.type = "audio/mpeg";
+  const controls = document.createElement("div");
+  controls.className = "custom-player";
 
-      player.appendChild(source);
-      voiceBox.appendChild(caption);
-      voiceBox.appendChild(player);
+  const playButton = document.createElement("button");
+  playButton.className = "play-button";
+  playButton.type = "button";
+  playButton.textContent = "▶";
 
-      letterText.insertAdjacentElement("afterend", voiceBox);
+  const progress = document.createElement("input");
+  progress.className = "audio-progress";
+  progress.type = "range";
+  progress.min = "0";
+  progress.max = "100";
+  progress.value = "0";
+  progress.setAttribute("aria-label", "Позиція аудіо");
+
+  const time = document.createElement("span");
+  time.className = "audio-time";
+  time.textContent = "0:00 / 0:00";
+
+  controls.append(playButton, progress, time);
+  voiceBox.append(caption, player, controls);
+  letterText.insertAdjacentElement("afterend", voiceBox);
+
+  function formatTime(seconds) {
+    if (!Number.isFinite(seconds)) return "0:00";
+    const minutes = Math.floor(seconds / 60);
+    const remaining = Math.floor(seconds % 60);
+    return `${minutes}:${String(remaining).padStart(2, "0")}`;
+  }
+
+  playButton.addEventListener("click", async () => {
+    if (player.paused) {
+      try {
+        await player.play();
+      } catch {
+        caption.textContent = "Не вдалося відтворити аудіо 😔 Перевір файл voice.mp3";
+      }
+    } else {
+      player.pause();
     }
+  });
+
+  player.addEventListener("play", () => {
+    playButton.textContent = "Ⅱ";
+  });
+
+  player.addEventListener("pause", () => {
+    playButton.textContent = "▶";
+  });
+
+  player.addEventListener("loadedmetadata", () => {
+    time.textContent = `0:00 / ${formatTime(player.duration)}`;
+  });
+
+  player.addEventListener("timeupdate", () => {
+    const percent = player.duration
+      ? (player.currentTime / player.duration) * 100
+      : 0;
+
+    progress.value = percent;
+    time.textContent =
+      `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`;
+  });
+
+  progress.addEventListener("input", () => {
+    if (player.duration) {
+      player.currentTime = (Number(progress.value) / 100) * player.duration;
+    }
+  });
+
+  player.addEventListener("ended", () => {
+    playButton.textContent = "▶";
+    progress.value = "0";
+  });
+}
+
 
     letterPanel.hidden = false;
 
